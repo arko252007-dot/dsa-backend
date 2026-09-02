@@ -32,7 +32,7 @@ const userSchema = new Schema(
     }
 );
 
-// Hash and salt password before saving
+// Only re-hash when modified; 10 salt rounds balances security and hash latency
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 
@@ -40,7 +40,6 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
-// Compare password method
 userSchema.methods.isPasswordCorrect = async function (password) {
     try {
         return await bcrypt.compare(password, this.password);

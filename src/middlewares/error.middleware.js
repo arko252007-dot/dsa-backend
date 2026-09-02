@@ -14,6 +14,7 @@ const errorHandler = (err, req, res, next) => {
         message: error.message,
         success: false,
         errors: error.errors,
+        // Omit stack trace in prod to prevent leaking runtime internals and server paths
         ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {})
     };
 

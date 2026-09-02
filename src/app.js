@@ -17,14 +17,12 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-// Routes Declaration (Direct clean routes: /users, /problems)
 import userRouter from "./routes/user.routes.js";
 import problemRouter from "./routes/problem.routes.js";
 
 app.use("/users", userRouter);
 app.use("/problems", problemRouter);
 
-// Health check endpoint
 app.get("/", (req, res) => {
     res.status(200).json({
         success: true,
@@ -36,7 +34,6 @@ app.get("/", (req, res) => {
     });
 });
 
-// Global Error Handler
 app.use(errorHandler);
 
 export { app };

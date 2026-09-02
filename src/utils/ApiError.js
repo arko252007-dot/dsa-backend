@@ -1,4 +1,3 @@
-// Standardized API Error Class
 class ApiError extends Error {
     constructor(
         statusCode,

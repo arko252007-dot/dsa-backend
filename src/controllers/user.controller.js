@@ -3,7 +3,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 
-// Sign Up New User (Unique username, min 8 chars password)
 const registerUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
@@ -21,13 +20,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Password must be at least 8 characters long");
     }
 
-    // Check if username already exists
     const existingUser = await User.findOne({ username: trimmedUsername });
     if (existingUser) {
         throw new ApiError(409, `Username '${trimmedUsername}' is already taken. Please choose another username or log in.`);
     }
 
-    // Create user
     try {
         const newUser = await User.create({
             username: trimmedUsername,
@@ -48,7 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
         );
     } catch (err) {
         if (err.code === 11000) {
-            // Attempt to drop legacy index in background if it caused the error
+            // Drop stale index if lingering from an older schema version
             try {
                 await User.collection.dropIndex("studentName_1");
             } catch (e) {}
@@ -58,7 +55,6 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-// Login Existing User
 const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
@@ -78,11 +74,10 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, `User '${trimmedUsername}' not found. Please sign up for a new account.`);
     }
 
-    // Check password using bcrypt
     const isPasswordValid = await user.isPasswordCorrect(password);
     
     if (!isPasswordValid) {
-        // Fallback for legacy plaintext password migration if any exist
+        // Upgrade legacy plaintext passwords on first successful login
         if (user.password === password) {
             user.password = password;
             await user.save();
@@ -111,7 +106,6 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-// Get User Profile & Solved Stats by Username
 const getUserStats = asyncHandler(async (req, res) => {
     const { username } = req.params;
 
@@ -145,7 +139,6 @@ const getUserStats = asyncHandler(async (req, res) => {
     );
 });
 
-// Toggle Problem Solved Status in DB
 const toggleSolveProblem = asyncHandler(async (req, res) => {
     const { username, problemId, isSolved } = req.body;
 

@@ -8,7 +8,7 @@ const connectDB = async () => {
         );
         console.log(`MongoDB Connected successfully! DB Host: ${connectionInstance.connection.host}`);
 
-        // Automatically clean up legacy indexes (e.g. old studentName_1) if present
+        // Drop legacy index from previous schema version to avoid unique constraint conflicts on signup
         try {
             const usersCollection = connectionInstance.connection.collection('users');
             const indexes = await usersCollection.indexes();
@@ -18,7 +18,7 @@ const connectDB = async () => {
                 console.log('Successfully dropped legacy index studentName_1');
             }
         } catch (idxErr) {
-            // Ignore if collection or index does not exist
+            // Collection or index hasn't been created yet
         }
     } catch (error) {
         console.error("MONGODB connection FAILED: ", error);

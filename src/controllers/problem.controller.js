@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Problem } from "../models/problem.model.js";
 
-// Get All Problems with optional query filtering
 const getAllProblems = asyncHandler(async (req, res) => {
     const { category, difficulty, search } = req.query;
 
@@ -27,7 +26,6 @@ const getAllProblems = asyncHandler(async (req, res) => {
     );
 });
 
-// Seed Problems Dataset
 const seedProblems = asyncHandler(async (req, res) => {
     const rawProblems = Array.isArray(req.body) ? req.body : req.body.problems;
 
@@ -39,7 +37,7 @@ const seedProblems = asyncHandler(async (req, res) => {
 
     const problems = rawProblems;
 
-    // Upsert each problem by problemId
+    // Upsert by problemId so repeated seed operations remain idempotent
     const bulkOps = problems.map((prob) => ({
         updateOne: {
             filter: { problemId: prob.id || prob.problemId },
@@ -66,7 +64,6 @@ const seedProblems = asyncHandler(async (req, res) => {
     );
 });
 
-// Delete All Problems
 const deleteAllProblems = asyncHandler(async (req, res) => {
     const result = await Problem.deleteMany({});
 
@@ -75,7 +72,6 @@ const deleteAllProblems = asyncHandler(async (req, res) => {
     );
 });
 
-// Delete Single Problem by ID
 const deleteProblemById = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
 
